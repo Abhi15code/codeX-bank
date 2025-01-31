@@ -7,8 +7,9 @@ import com.codeX.codex_bank.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmail(String email);
-    // Boolean existsByAccountNumber(String accountNumber);
-    
+    Boolean existsByAccountNumber(String accountNumber);
+    User findByAccountNumber(String accountNumber);
+
 
 
 
