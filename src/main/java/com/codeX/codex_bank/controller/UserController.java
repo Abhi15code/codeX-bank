@@ -14,17 +14,43 @@ import com.codeX.codex_bank.dto.TransferRequest;
 import com.codeX.codex_bank.dto.UserRequest;
 import com.codeX.codex_bank.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/user")
+@Tag(name="User Account Management API's")
 public class UserController {
     
     @Autowired
     private UserService userService;
 
+    @Operation(
+        summary = "Creating a new Account",
+        description = "creating a new user account and assigning a Account Number"
+        
+    )
+    @ApiResponse(
+        responseCode = "201"
+        ,description = "Http status 201 CREATED"
+
+    )
+
     @PostMapping
     public BankResponse createUser(@RequestBody UserRequest userRequest) {
         return userService.createUser(userRequest);
     }
+    @Operation(
+        summary = "Balance Enquriy",
+        description = "given a Account Number, check how much mone Account have"
+        
+    )
+    @ApiResponse(
+        responseCode = "200"
+        ,description = "Http status 200 SUCCESS"
+
+    )
 
     @GetMapping("/balanceEnquiry")
     public BankResponse balanceEnquiry(@RequestBody EnquiryRequest enquiryRequest){
