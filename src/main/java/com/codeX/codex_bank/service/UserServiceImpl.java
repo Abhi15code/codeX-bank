@@ -38,6 +38,8 @@ public class UserServiceImpl implements UserService {
                     .responseMessage(AccountUtill.ACCOUNT_EXISTS_MESSAGE).accountInfo(null).build();
         }
 
+
+
         User newuser = User.builder().firstName(userRequest.getFirstName()).lastName(userRequest.getLastName())
                 .gender(userRequest.getGender()).address(userRequest.getAddress()).email(userRequest.getEmail())
                 .phoneNumber(userRequest.getPhoneNumber()).accountNumber(AccountUtill.generateAccountNumber())

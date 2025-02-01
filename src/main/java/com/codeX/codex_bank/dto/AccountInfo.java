@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class AccountInfo {
+
+
+    
     @Schema(
         name = "User Account Name"
     )

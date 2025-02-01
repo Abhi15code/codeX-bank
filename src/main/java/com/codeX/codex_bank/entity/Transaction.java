@@ -1,5 +1,11 @@
 package com.codeX.codex_bank.entity;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import org.hibernate.annotations.CurrentTimestamp;
+
+import com.codeX.codex_bank.dto.BankResponse;
+import com.codeX.codex_bank.dto.TransactionDto;
 
 import jakarta.annotation.Generated;
 import jakarta.persistence.Entity;
@@ -32,6 +38,8 @@ public class Transaction {
     private BigDecimal amount;
     private String accountNumber;
     private String status;
+    @CurrentTimestamp
+    private LocalDate createdAt;
 
     
     
