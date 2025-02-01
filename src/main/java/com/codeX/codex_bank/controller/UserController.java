@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codeX.codex_bank.dto.BankResponse;
 import com.codeX.codex_bank.dto.CreditDebitRequest;
 import com.codeX.codex_bank.dto.EnquiryRequest;
+import com.codeX.codex_bank.dto.TransferRequest;
 import com.codeX.codex_bank.dto.UserRequest;
 import com.codeX.codex_bank.service.UserService;
 
@@ -48,6 +49,10 @@ public class UserController {
 
    }
 
+   @PostMapping("/transfer")
+   public BankResponse transfer(@RequestBody TransferRequest request){
+    return userService.transfer(request);
+   }
 
     
 

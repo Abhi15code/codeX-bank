@@ -7,11 +7,11 @@ public class AccountUtill {
     public static String ACCOUNT_EXISTS_CODE = "001";
     public static String ACCOUNT_EXISTS_MESSAGE = "Account already exists";
 
-    public static String USER_FOUND_CODE = "003";
-    public static String USER_FOUND_MESSAGE = "User found successfully";
+    public static String ACCOUNT_FOUND_CODE = "003";
+    public static String ACCOUNT_FOUND_MESSAGE = "User found successfully";
 
-    public static String USER_NOT_EXISTS_CODE = "004";
-    public static String USER_NOT_EXISTS_MESSAGE = "User not found";
+    public static String ACCOUNT_NOT_EXISTS_CODE = "004";
+    public static String ACCOUNT_NOT_EXISTS_MESSAGE = "User not found";
   
     public static String ACCOUNT_CREATED_CODE = "002";
     public static String ACCOUNT_CREATED_MESSAGE = "Account created successfully";
@@ -26,6 +26,12 @@ public class AccountUtill {
     public static String ACCOUNT_DEBITED_CODE = "007";
     public static String ACCOUNT_DEBITED_MESSAGE = "Account debited successfully";
     
+    public static String DEBIT_ACCOUNT_NOT_EXIST_CODE = "008";
+    // public static String DEBIT_ACCOUNT_NOT_EXIST_MESSAGE = "The account you're are t"
+
+
+    public static final String TRANSfER_SUCCESFULL_CODE = "009";
+    public static final String TRANSFER_SUCCESSFULL_MESSAGE = "transfer Succesfull";
 
     public static String generateAccountNumber(){
         Year currentyear = Year.now();

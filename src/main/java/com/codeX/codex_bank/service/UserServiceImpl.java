@@ -10,6 +10,7 @@ import com.codeX.codex_bank.dto.BankResponse;
 import com.codeX.codex_bank.dto.CreditDebitRequest;
 import com.codeX.codex_bank.dto.EmailDetails;
 import com.codeX.codex_bank.dto.EnquiryRequest;
+import com.codeX.codex_bank.dto.TransferRequest;
 import com.codeX.codex_bank.dto.UserRequest;
 import com.codeX.codex_bank.entity.User;
 import com.codeX.codex_bank.repository.UserRepository;
@@ -21,7 +22,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     @Autowired
-    EmailService EmailService;
+    EmailService emailService;
 
     @Override
     public BankResponse createUser(UserRequest userRequest) {
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
                         + "Account Number: " + savedUser.getAccountNumber())
                 .build();
 
-        EmailService.sendAlert(emailDetails);
+        emailService.sendAlert(emailDetails);
 
         return BankResponse.builder().responseCode(AccountUtill.ACCOUNT_CREATED_CODE)
                 .responseMessage(AccountUtill.ACCOUNT_CREATED_MESSAGE).accountInfo(
@@ -62,17 +63,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
-
     // balance Enquiry , name Enquiry, creding, debit, transer
 
     @Override
     public BankResponse balanceEnquiry(EnquiryRequest request) {
-//      check if the account exists
+        // check if the account exists
         boolean accountExists = userRepository.existsByAccountNumber(request.getAccountNumber());
         if (!accountExists) {
-            return BankResponse.builder().responseCode(AccountUtill.USER_NOT_EXISTS_CODE)
-                    .responseMessage(AccountUtill.USER_NOT_EXISTS_MESSAGE).accountInfo(null).build();
+            return BankResponse.builder().responseCode(AccountUtill.ACCOUNT_NOT_EXISTS_CODE)
+                    .responseMessage(AccountUtill.ACCOUNT_NOT_EXISTS_MESSAGE).accountInfo(null).build();
 
         }
 
@@ -81,8 +80,8 @@ public class UserServiceImpl implements UserService {
         // return the account balance if the account exists
 
         return BankResponse.builder().responseCode(AccountUtill.ACCOUNT_EXISTS_CODE)
-                .responseMessage(AccountUtill.USER_FOUND_CODE)
-                .responseMessage(AccountUtill.USER_FOUND_MESSAGE)
+                .responseMessage(AccountUtill.ACCOUNT_FOUND_CODE)
+                .responseMessage(AccountUtill.ACCOUNT_FOUND_MESSAGE)
                 .accountInfo(AccountInfo.builder()
                         .accountBalance(founduser.getAccountBalance())
                         .accountName(founduser.getFirstName() + " " + founduser.getLastName()).build())
@@ -95,7 +94,7 @@ public class UserServiceImpl implements UserService {
         // check if the account exists
         boolean accountExists = userRepository.existsByAccountNumber(enqurityRequest.getAccountNumber());
         if (!accountExists) {
-            return AccountUtill.USER_NOT_EXISTS_MESSAGE;
+            return AccountUtill.ACCOUNT_NOT_EXISTS_MESSAGE;
         }
 
         User founduser = userRepository.findByAccountNumber(enqurityRequest.getAccountNumber());
@@ -110,12 +109,12 @@ public class UserServiceImpl implements UserService {
         boolean accountExists = userRepository.existsByAccountNumber(request.getAccountNumber());
 
         if (!accountExists) {
-            return BankResponse.builder().responseCode(AccountUtill.USER_NOT_EXISTS_CODE)
-                    .responseMessage(AccountUtill.USER_NOT_EXISTS_MESSAGE).accountInfo(null).build();
+            return BankResponse.builder().responseCode(AccountUtill.ACCOUNT_NOT_EXISTS_CODE)
+                    .responseMessage(AccountUtill.ACCOUNT_NOT_EXISTS_MESSAGE).accountInfo(null).build();
 
         }
-        
-        // get the user
+
+        // get the ACCOUNT
 
         User userToCredit = userRepository.findByAccountNumber(request.getAccountNumber());
         userToCredit.setAccountBalance(userToCredit.getAccountBalance().add(request.getAmount()));
@@ -123,20 +122,14 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userToCredit);
 
         return BankResponse.builder().responseCode(AccountUtill.ACCOUNT_CREDITED_CODE)
-        .responseMessage(AccountUtill.ACCOUNT_CREDITED_MESSAGE)
-        .accountInfo(AccountInfo.builder().
-        accountName(userToCredit.getFirstName() + " " + userToCredit.getLastName())
-        .accountNumber(userToCredit.getAccountNumber())
-        .accountBalance(userToCredit.getAccountBalance()).build()).
-
-        
-        build();
-
-        
+                .responseMessage(AccountUtill.ACCOUNT_CREDITED_MESSAGE)
+                .accountInfo(AccountInfo.builder()
+                .accountName(userToCredit.getFirstName() + " " + userToCredit.getLastName())
+                .accountNumber(userToCredit.getAccountNumber())
+                .accountBalance(userToCredit.getAccountBalance()).build())
+                .build();
 
     }
-
-
 
     // Debting balance from a account
 
@@ -148,49 +141,117 @@ public class UserServiceImpl implements UserService {
         boolean accountExists = userRepository.existsByAccountNumber(request.getAccountNumber());
 
         if (!accountExists) {
-            return BankResponse.builder().responseCode(AccountUtill.USER_NOT_EXISTS_CODE)
-                    .responseMessage(AccountUtill.USER_NOT_EXISTS_MESSAGE).accountInfo(null).build();
+            return BankResponse.builder().responseCode(AccountUtill.ACCOUNT_NOT_EXISTS_CODE)
+                    .responseMessage(AccountUtill.ACCOUNT_NOT_EXISTS_MESSAGE).accountInfo(null).build();
 
         }
 
         // check you want to withdraw more than the account balance
 
-        User userToDebit  = userRepository.findByAccountNumber(request.getAccountNumber());
+        User userToDebit = userRepository.findByAccountNumber(request.getAccountNumber());
 
-        // int avalibleBalance = Integer.parseInt(userToDebit.getAccountBalance().toString());
-        // int  debitBalalnce = Integer.parseInt(request.getAmount().toString());
+        // int avalibleBalance =
+        // Integer.parseInt(userToDebit.getAccountBalance().toString());
+        // int debitBalalnce = Integer.parseInt(request.getAmount().toString());
         // we can compare with the above code but we can use the below code
         // if(avalibleBalance < debitBalalnce)
-        
-        if(userToDebit.getAccountBalance() .compareTo(request.getAmount()) < 0){
-            return BankResponse.builder().
-            responseCode(AccountUtill.INSUFFICIENT_BALANCE_CODE)
-            .responseMessage(AccountUtill.INSUFFICIENT_BALANCE_MESSAGE)
-            .accountInfo(null).build();
-        }
-        else{
+
+        if (userToDebit.getAccountBalance().compareTo(request.getAmount()) < 0) {
+            return BankResponse.builder().responseCode(AccountUtill.INSUFFICIENT_BALANCE_CODE)
+                    .responseMessage(AccountUtill.INSUFFICIENT_BALANCE_MESSAGE)
+                    .accountInfo(null).build();
+        } else {
             userToDebit.setAccountBalance(userToDebit.getAccountBalance().subtract(request.getAmount()));
             userRepository.save(userToDebit);
 
             return BankResponse.builder().responseCode(AccountUtill.ACCOUNT_DEBITED_CODE)
-            .responseMessage(AccountUtill.ACCOUNT_DEBITED_MESSAGE)
-            .accountInfo(AccountInfo.builder().
-            accountName(userToDebit.getFirstName() + " " + userToDebit.getLastName())
-            .accountNumber(userToDebit.getAccountNumber())
-            .accountBalance(userToDebit.getAccountBalance()).build()).
-    
-            
-            build();
+                    .responseMessage(AccountUtill.ACCOUNT_DEBITED_MESSAGE)
+                    .accountInfo(AccountInfo.builder()
+                    .accountName(userToDebit.getFirstName() + " " + userToDebit.getLastName())
+                    .accountNumber(userToDebit.getAccountNumber())
+                    .accountBalance(userToDebit.getAccountBalance()).build())
+                    .build();
         }
+
+    }
+
+    // transfer
+    @Override
+    public BankResponse transfer(TransferRequest request) {
+
+        
+
+        // get the account to debit(check user exist or not)
+        // boolean isSourceAccountExist = userRepository.existsByAccountNumber(request.getSourceAccountNumber());
+        boolean isDestinationAccountExist = userRepository.existsByAccountNumber(request.getDestinationAccountNumber());
+
+
+
+        if(!isDestinationAccountExist){
+            return BankResponse.builder()
+            .responseCode(AccountUtill.ACCOUNT_NOT_EXISTS_CODE).responseMessage(AccountUtill.ACCOUNT_NOT_EXISTS_MESSAGE)
+            .accountInfo(null)                  
+            .build();
+                    
+        }
+       
+        User sourceDebit = userRepository.findByAccountNumber(request.getSourceAccountNumber());
+
+        if(request.getAmount().compareTo(sourceDebit.getAccountBalance())>0){
+            return BankResponse.builder().responseCode(AccountUtill.INSUFFICIENT_BALANCE_CODE)
+            .responseMessage(AccountUtill.INSUFFICIENT_BALANCE_MESSAGE)
+            .accountInfo(null).build();
+
+        }
+       sourceDebit.setAccountBalance(sourceDebit.getAccountBalance().subtract(request.getAmount()));
+       userRepository.save(sourceDebit);
+
+       String sourceUserName = sourceDebit.getFirstName() +"  "+sourceDebit.getLastName();
+      
+
+        
+       User destinationCredit  = userRepository.findByAccountNumber(request.getDestinationAccountNumber());
+       destinationCredit.setAccountBalance(destinationCredit.getAccountBalance().add(request.getAmount()));
+       userRepository.save(destinationCredit);
+
+       String recipentUserName = destinationCredit.getFirstName()+" "+destinationCredit.getLastName();
+
+       EmailDetails creditAlert  = EmailDetails.builder()
+       .reciptient(destinationCredit.getEmail())
+       .subject("CREDIT ALERT")
+       .messageBody("Amount= "+request.getAmount()+" credit to your account  from "+sourceUserName+" Your Current Balance is ="+sourceDebit.getAccountBalance())
+       .build();
+
+        
+       
+       EmailDetails debitAlert  = EmailDetails.builder()
+       .reciptient(sourceDebit.getEmail())
+       .subject("DEBIT ALERT")
+       .messageBody("Amount= "+request.getAmount()+" Deducted from your account send to "+recipentUserName+" Your Current Balance is ="+sourceDebit.getAccountBalance())
+       .build();
+
+        emailService.sendAlert(debitAlert);
+        emailService.sendAlert(creditAlert);
+
+
+        return BankResponse.builder().
+        responseCode(AccountUtill.TRANSfER_SUCCESFULL_CODE)
+        .responseMessage(AccountUtill.TRANSFER_SUCCESSFULL_MESSAGE)
+        .accountInfo(AccountInfo.builder()
+        .accountName(sourceDebit.getFirstName()+" "+sourceDebit.getLastName())
+        .accountNumber(sourceDebit.getAccountNumber())
+        .accountBalance(sourceDebit.getAccountBalance()).build()).
+        build();
+        // check if amount i'm debiting is not more tha my current account balance
+        //debit the account
+        // get the account to credit
+        // credit the account
 
 
     }
 
-
-
-
-
-
     
-    
+
+
+
 }
