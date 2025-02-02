@@ -3,16 +3,23 @@ package com.codeX.codex_bank.service;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.codeX.codex_bank.config.JwtTokenProvider;
 import com.codeX.codex_bank.dto.AccountInfo;
 import com.codeX.codex_bank.dto.BankResponse;
 import com.codeX.codex_bank.dto.CreditDebitRequest;
 import com.codeX.codex_bank.dto.EmailDetails;
 import com.codeX.codex_bank.dto.EnquiryRequest;
+import com.codeX.codex_bank.dto.LoginDto;
 import com.codeX.codex_bank.dto.TransactionDto;
 import com.codeX.codex_bank.dto.TransferRequest;
 import com.codeX.codex_bank.dto.UserRequest;
+import com.codeX.codex_bank.entity.Role;
 import com.codeX.codex_bank.entity.User;
 import com.codeX.codex_bank.repository.UserRepository;
 import com.codeX.codex_bank.utill.AccountUtill;
@@ -27,6 +34,17 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     TransactionService transactionService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
+
+
     @Override
     public BankResponse createUser(UserRequest userRequest) {
         /*
@@ -42,8 +60,9 @@ public class UserServiceImpl implements UserService {
 
         User newuser = User.builder().firstName(userRequest.getFirstName()).lastName(userRequest.getLastName())
                 .gender(userRequest.getGender()).address(userRequest.getAddress()).email(userRequest.getEmail())
+                .password(passwordEncoder.encode(userRequest.getPassword()))
                 .phoneNumber(userRequest.getPhoneNumber()).accountNumber(AccountUtill.generateAccountNumber())
-                .accountBalance(BigDecimal.ZERO).status("ACTIVE").build();
+                .accountBalance(BigDecimal.ZERO).status("ACTIVE").role(Role.ROLE_ADMIN).build();
 
         User savedUser = userRepository.save(newuser);
 
@@ -67,6 +86,31 @@ public class UserServiceImpl implements UserService {
                 .build();
 
     }
+
+    @Override
+    public BankResponse login(LoginDto loginDto){
+
+        Authentication authentication = null;
+        authentication = authenticationManager.authenticate(
+
+        new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        );
+            EmailDetails loginAlert  = EmailDetails.builder().
+                                          reciptient(loginDto.getEmail())
+                                          .subject("You're Loged In..")
+                                          .messageBody("You  Logged into your account. if you do not initiate this reqeust please contact to bank ")
+                                         .build();
+
+                                         emailService.sendAlert(loginAlert);
+
+                                         
+                            return  BankResponse.builder().
+                                    responseCode("Login Success")
+                                    .responseMessage(jwtTokenProvider.generateToken(authentication))
+                                   .build();
+        
+           }
+
 
     // balance Enquiry , name Enquiry, creding, debit, transer
 

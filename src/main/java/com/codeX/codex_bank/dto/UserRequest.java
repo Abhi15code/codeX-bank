@@ -4,6 +4,7 @@ package com.codeX.codex_bank.dto;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class UserRequest {
     private String gender;
     private String address;
     private String email;
-    // private String password;
+    private String password;
     private String phoneNumber;
     // private String accountNumber;
     // private BigDecimal accountBalance;

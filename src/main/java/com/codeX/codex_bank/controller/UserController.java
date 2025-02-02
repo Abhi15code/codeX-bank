@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codeX.codex_bank.dto.BankResponse;
 import com.codeX.codex_bank.dto.CreditDebitRequest;
 import com.codeX.codex_bank.dto.EnquiryRequest;
+import com.codeX.codex_bank.dto.LoginDto;
 import com.codeX.codex_bank.dto.TransferRequest;
 import com.codeX.codex_bank.dto.UserRequest;
 import com.codeX.codex_bank.service.UserService;
@@ -51,6 +52,16 @@ public class UserController {
         ,description = "Http status 200 SUCCESS"
 
     )
+
+    @PostMapping("/login")
+    public BankResponse login(@RequestBody LoginDto loginDto){
+        return userService.login(loginDto);
+
+    }
+
+
+
+
 
     @GetMapping("/balanceEnquiry")
     public BankResponse balanceEnquiry(@RequestBody EnquiryRequest enquiryRequest){

@@ -30,8 +30,14 @@ public class AccountUtill {
     // public static String DEBIT_ACCOUNT_NOT_EXIST_MESSAGE = "The account you're are t"
 
 
+
     public static final String TRANSfER_SUCCESFULL_CODE = "009";
     public static final String TRANSFER_SUCCESSFULL_MESSAGE = "transfer Succesfull";
+
+    public static final String LOGIN_SUCCESSFULL_CODE = "010";
+    public static final String LOGIN_SUCCESSFULL_MESSAGE = "Login Success";
+    
+
 
     public static String generateAccountNumber(){
         Year currentyear = Year.now();

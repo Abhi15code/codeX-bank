@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 
 
 @RestController
-@RequestMapping("/bankstatememt")
+@RequestMapping("/bankstatement")
 @AllArgsConstructor
 
 public class TransactionController {
