@@ -18,6 +18,7 @@ public interface UserService {
         BankResponse debitAccount(CreditDebitRequest creaditDebitRequest);
         BankResponse transfer(TransferRequest transferRequest); 
         BankResponse login(LoginDto loginDto);
+        BankResponse getUserByAccNo(String email);
 
 }
 

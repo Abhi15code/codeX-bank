@@ -1,6 +1,10 @@
 package com.codeX.codex_bank.service;
 
 import java.math.BigDecimal;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -95,10 +99,26 @@ public class UserServiceImpl implements UserService {
 
         new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
         );
+
+
+             LocalTime currentTime = LocalTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String formattedTime = currentTime.format(formatter);
+
+
             EmailDetails loginAlert  = EmailDetails.builder().
                                           reciptient(loginDto.getEmail())
                                           .subject("You're Loged In..")
-                                          .messageBody("You  Logged into your account. if you do not initiate this reqeust please contact to bank ")
+                                          .messageBody("Dear,\n" + //
+                                                                                            "\n" + //
+                                                                                            "You have successfully logged into your CodexBank account on "+formattedTime+".\n" + //
+                                                                                            "\n" + //
+                                                                                            "If this was you, no further action is required. If you did not log in, please contact our customer support immediately to secure your account.\n" + //
+                                                                                            "\n" + //
+                                                                                            "For security reasons, never share your login credentials with anyone.\n" + //
+                                                                                            "\n" + //
+                                                                                            "Thank you for banking with us.\n" + //
+                                                                                            "CodeXBank – Secure & Trusted Banking")
                                          .build();
 
                                          emailService.sendAlert(loginAlert);
@@ -337,6 +357,14 @@ public class UserServiceImpl implements UserService {
         // credit the account
 
 
+    }
+
+    @Override
+    public BankResponse getUserByAccNo(String acc) {
+       User userbyName = userRepository.findByAccountNumber(acc);
+
+
+      return BankResponse.builder().responseMessage("User Found : " + userbyName.getFirstName()).build();
     }
 
     

@@ -1,7 +1,11 @@
 package com.codeX.codex_bank.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +17,9 @@ import com.codeX.codex_bank.dto.EnquiryRequest;
 import com.codeX.codex_bank.dto.LoginDto;
 import com.codeX.codex_bank.dto.TransferRequest;
 import com.codeX.codex_bank.dto.UserRequest;
+import com.codeX.codex_bank.entity.User;
 import com.codeX.codex_bank.service.UserService;
+import com.itextpdf.text.pdf.PdfStructTreeController.returnType;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,6 +32,8 @@ public class UserController {
     
     @Autowired
     private UserService userService;
+
+
 
     @Operation(
         summary = "Creating a new Account",
@@ -58,6 +66,15 @@ public class UserController {
         return userService.login(loginDto);
 
     }
+
+    @GetMapping("/{name}")
+
+    public ResponseEntity<BankResponse> getuserbyname(@PathVariable String name){
+            return new ResponseEntity<>(userService.getUserByAccNo(name),HttpStatus.OK);
+
+           
+    }
+
 
 
 
